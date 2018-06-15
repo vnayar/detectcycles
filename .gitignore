@@ -2,7 +2,6 @@
 docs.json
 __dummy.html
 docs/
-detectcycles
 detectcycles.so
 detectcycles.dylib
 detectcycles.dll
