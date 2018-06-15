@@ -1,0 +1,23 @@
+.dub
+docs.json
+__dummy.html
+docs/
+detectcycles
+detectcycles.so
+detectcycles.dylib
+detectcycles.dll
+detectcycles.a
+detectcycles.lib
+detectcycles-test-*
+*.exe
+*.o
+*.obj
+*.lst
+dub.selections.json
+
+# unit-threaded
+bin/
+
+# Emacs/Vim
+\#*\#
+*~

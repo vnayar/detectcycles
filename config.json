@@ -1,0 +1,9 @@
+[
+  {
+    "language": "Java",
+    "fileGlob": "*.java",
+    "fileModuleRegex": ".*\([^/\\]\).java",
+    "sourceModuleRegex": "package \(.*\);",
+    "moduleName": "$sourceModule.$fileModule"
+  }
+]

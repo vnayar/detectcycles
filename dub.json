@@ -1,0 +1,32 @@
+{
+  "name": "detectcycles",
+  "authors": [
+	"Vijay Nayar"
+  ],
+  "description": "Detect dependency cycles from source code.",
+  "copyright": "Copyright © 2018, Vijay Nayar",
+  "license": "proprietary",
+
+  "configurations": [
+    {
+      "name": "executable",
+      "targetType": "executable"
+    },
+    {
+      "name": "unittest",
+      "excludedSourceFiles": ["src/app.d"],
+      "sourcePaths": [
+        "test"
+      ],
+      "importPaths": [
+        "test"
+      ],
+      "targetType": "executable",
+      "preBuildCommands": ["dub run unit-threaded -c gen_ut_main -- -f bin/ut.d"],
+      "mainSourceFile": "bin/ut.d",
+      "dependencies": {
+        "unit-threaded": "~>0.7.11"
+      }
+    }
+  ]
+}
