@@ -12,14 +12,18 @@ Config[] initTestLanguageConfigs() {
     "fileGlob": "*.java",
     "fileModuleRegex": ".*\\([^/\\\\]\\).java",
     "sourceModuleRegex": "package \\(.*\\);",
-    "moduleName": "$sourceModule.$fileModule"
+    "moduleName": "$sourceModule.$fileModule",
+    "usesRegex": "import ([^;]+);",
+    "statementDelimitorRegex": "[;]"
   },
   {
     "language": "D",
     "fileGlob": "*.{d,di}",
     "fileModuleRegex": "",
     "sourceModuleRegex": "module \\(.*\\);",
-    "moduleName": "$sourceModule"
+    "moduleName": "$sourceModule",
+    "usesRegex": "import ([^;]+);",
+    "statementDelimitorRegex": "[;]"
   }
 ]
 EOS");
@@ -37,4 +41,6 @@ unittest {
   (javaConfig.fileModuleRegex).shouldEqual(".*\\([^/\\\\]\\).java");
   (javaConfig.sourceModuleRegex).shouldEqual("package \\(.*\\);");
   (javaConfig.moduleName).shouldEqual("$sourceModule.$fileModule");
+  (javaConfig.usesRegex).shouldEqual("import ([^;]+);");
+  (javaConfig.statementDelimitorRegex).shouldEqual("[;]");
 }

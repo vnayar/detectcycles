@@ -14,6 +14,8 @@ class Config {
   string fileModuleRegex;
   string sourceModuleRegex;
   string moduleName;
+  string usesRegex;
+  string statementDelimitorRegex;
 }
 
 Config[] loadConfigsFromJson(R)(R jsonInput)
@@ -29,7 +31,8 @@ if (isInputRange!R && !isInfinite!R && isSomeChar!(ElementEncodingType!R)) {
     config.fileModuleRegex = val["fileModuleRegex"].str;
     config.sourceModuleRegex = val["sourceModuleRegex"].str;
     config.moduleName = val["moduleName"].str;
-
+    config.usesRegex = val["usesRegex"].str;
+    config.statementDelimitorRegex = val["statementDelimitorRegex"].str;
     configs ~= config;
   }
   return configs;
