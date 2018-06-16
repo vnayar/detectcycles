@@ -10,43 +10,13 @@ import std.string : replace, empty;
 import std.traits : isSomeChar;
 
 
-/**
- * Extracts dependency information from a given file using provided configurations.
- */
+/// Extracts dependency information from a given file using provided configurations.
 class Extractor {
-private:
-  Config[] _configs;
-  
-
-public:
-  this(Config[] configs) {
-    _configs = configs;
-  }
-
-  @property
-  Config[] configs() {
-    return _configs;
-  }
-
-  /**
-   * Given a file name, determine what language configuration is appropriate for it.
-   * If there are no matches, return null.
-   */
-  Config findConfigForFileName(string fileName) {
-    foreach (c; _configs) {
-      if (globMatch(fileName, c.fileGlob)) {
-        return c;
-      }
-    }
-    return null;
-  }
-
   string extractModuleName(R)(Config config, string fileName, R sourceInput)
-  if (isInputRange!R && !isInfinite!R && isSomeChar!(ElementEncodingType!R)) {
-    // No config means we don't know how to procede.
-    if (config is null) {
-      return null;
-    }
+  if (isInputRange!R && !isInfinite!R && isSomeChar!(ElementEncodingType!R))
+  in {
+    assert(config !is null);
+  } body {
     auto captures = matchFirst(fileName, config.fileModuleRegex);
     // If a capture group exists, inside \( and \), use that, otherwise use the whole match.
     string fileNamePart = !captures.empty() ? captures[captures.length - 1] : "";

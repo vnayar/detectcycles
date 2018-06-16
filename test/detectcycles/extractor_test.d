@@ -45,22 +45,6 @@ class Ham {
 EOS";
 }
 
-
-@("findConfigForFileName")
-unittest {
-  auto extractor = new Extractor(initConfigs());
-  (extractor.findConfigForFileName("ham.d").language).shouldEqual("D");
-  (extractor.findConfigForFileName("bird/fish/cat/ham.d").language).shouldEqual("D");
-  (extractor.findConfigForFileName("/fence/dog.di").language).shouldEqual("D");
-  (extractor.findConfigForFileName("../ham.d").language).shouldEqual("D");
-  (extractor.findConfigForFileName("~/rum/bacon.d").language).shouldEqual("D");
-
-  (extractor.findConfigForFileName("~/rum/bacon.d.java").language).shouldEqual("Java");
-
-  (extractor.findConfigForFileName("digdog/benno.dig")).shouldBeNull;
-  (extractor.findConfigForFileName("digdog/benno.dog")).shouldBeNull;
-}
-
 @("extractModuleName")
 unittest {
   auto extractor = new Extractor(initConfigs());

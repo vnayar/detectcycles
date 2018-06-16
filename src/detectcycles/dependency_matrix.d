@@ -4,6 +4,7 @@ import std.stdio;
 import std.container.rbtree;
 import std.typecons : Typedef;
 
+
 alias IdSet = RedBlackTree!size_t;
 
 class DependencyMatrix {
@@ -12,12 +13,13 @@ private:
   string[] _moduleNameById;
   IdSet[] _dependencies;
 
-public:
   invariant {
     size_t length = _moduleIdByName.length;
     assert(_moduleNameById.length == length);
     assert(_dependencies.length == length);
   }
+
+public:
 
   size_t numSymbols() {
     return _moduleNameById.length;
