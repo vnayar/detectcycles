@@ -42,7 +42,9 @@ void main(string[] args)
 
   if (getOptResult.helpWanted) {
     defaultGetoptPrinter(
-        "detectcycles: The source code dependency cycle detector.", getOptResult.options);
+        "detectcycles: The source code dependency cycle detector.\n"
+            ~ "Usage: detectcycles [options] [srcDir1] [srcDir2] ...",
+        getOptResult.options);
     return;
   }
 
