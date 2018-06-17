@@ -84,7 +84,7 @@ $ detectcycles --config detectcycles.json
 ```
 
 The format of the config file is as follows:
-```json
+```
 [
   {
     # The name of the language when chosen with the "--language" option.
