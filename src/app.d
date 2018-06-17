@@ -5,26 +5,51 @@ import detectcycles.dependency_matrix;
 import std.file : readText, dirEntries, SpanMode;
 import std.getopt : getopt, GetoptResult, defaultGetoptPrinter;
 import std.path : expandTilde;
-import std.stdio : writeln;
+import std.stdio : write, writeln;
 import std.algorithm : find, map;
 import std.range : takeOne;
 
+enum LogLevel { OFF, DEBUG }
+class Logger {
+  LogLevel _logLevel;
+  this(LogLevel logLevel) {
+    _logLevel = logLevel;
+  }
+  void logDebug(T...)(lazy T args) {
+    if (_logLevel == LogLevel.DEBUG) {
+      writeln(args);
+    }
+  }
+}
 
 void main(string[] args)
 {
+  string configFile;
+  bool debugLog;
+  bool generate;
   string language;
   bool showLanguages;
-  string configFile;
 
   GetoptResult getOptResult = getopt(
       args,
       "config|c", "Specify a custom language-support configuration file to use.", &configFile,
+      "debug|d", "Enable debug logging.", &debugLog,
+      "generate|g", "Generates default configurations to modify and use with -c.", &generate,
       "language|l", "Limit scanning to only a specific language.", &language,
       "showLanguages|s", "Show the supported languages.", &showLanguages);
+
+  auto logger = new Logger( debugLog ? LogLevel.DEBUG : LogLevel.OFF);
 
   if (getOptResult.helpWanted) {
     defaultGetoptPrinter(
         "detectcycles: The source code dependency cycle detector.", getOptResult.options);
+    return;
+  }
+
+  if (generate) {
+    writeln("Save the following to a file");
+    writeln("============================");
+    writeln(detectcycles.config.defaultConfig);
     return;
   }
 
@@ -63,25 +88,44 @@ void main(string[] args)
   auto extractor = new Extractor();
   auto dependencyMatrix = new DependencyMatrix();
   foreach (rootDir; rootDirs) {
+    rootDir = expandTilde(rootDir);
     foreach (config; configs) {
       auto dFiles = dirEntries(rootDir, config.fileGlob, SpanMode.depth);
       foreach (dirEntry; dFiles) {
         if (!dirEntry.isFile()) {
           continue;
         }
-        writeln(dirEntry.name);
+        logger.logDebug(dirEntry.name);
         string sourceText = readText(dirEntry.name);
         string moduleName =
             extractor.extractModuleName(config, dirEntry.name, sourceText);
-        writeln("  module: '", moduleName, "'");
+        logger.logDebug("  module: \"", moduleName, "\"");
         string[] usedModules = extractor.extractUsedModuleNames(config, sourceText);
-        writeln("  uses  : ", usedModules);
+        logger.logDebug("  uses  : ", usedModules);
         if (moduleName is null || moduleName.length == 0) {
-          writeln("  -- Skipping module with no name.");
+          logger.logDebug("  -- Skipping module with no name.");
           continue;
         }
         dependencyMatrix.addDependencies(moduleName, usedModules);
       }
+    }
+  }
+
+  // Finally detect the cycles and print them out.
+  string[][] stronglyConnectedComponents = dependencyMatrix.detectStronglyConnectedComponents();
+  if (stronglyConnectedComponents.length == 0) {
+    writeln("No cycles detected.");
+  } else {
+    writeln("The following cycles were detected:");
+    foreach (i, scc; stronglyConnectedComponents) {
+      writeln("Cycle #", i);
+      foreach (j, moduleName; scc) {
+        if (j != 0) {
+          write(" => ");
+        }
+        write(moduleName);
+      }
+      writeln("\n");
     }
   }
 }

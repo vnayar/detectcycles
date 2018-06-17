@@ -47,7 +47,7 @@ unittest {
       .shouldBeTrue;
 }
 
-@("detectStronglyConnectedComponents")
+@("detectStronglyConnectedComponentsByModuleId")
 unittest {
   auto dMatrix = new DependencyMatrix();
 
@@ -60,7 +60,7 @@ unittest {
   dMatrix.addDependencies("infrastructure", ["workers", "resources"]);
   dMatrix.addDependencies("workers", ["city"]);
 
-  size_t[][] sccs = dMatrix.detectStronglyConnectedComponents();
+  size_t[][] sccs = dMatrix.detectStronglyConnectedComponentsByModuleId();
 
   (sccs.length).shouldEqual(2);
 

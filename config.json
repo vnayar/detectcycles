@@ -2,8 +2,28 @@
   {
     "language": "Java",
     "fileGlob": "*.java",
-    "fileModuleRegex": ".*\([^/\\]\).java",
-    "sourceModuleRegex": "package \(.*\);",
-    "moduleName": "$sourceModule.$fileModule"
+    "fileModuleRegex": "(.+[/\\\\])?([^/\\\\]+).java",
+    "sourceModuleRegex": "^package (.+);",
+    "moduleName": "$sourceModule.$fileModule",
+    "usesRegex": "^import ([^;]+);",
+    "statementDelimitorRegex": "[;]"
+  },
+  {
+    "language": "D",
+    "fileGlob": "*.{d,di}",
+    "fileModuleRegex": "",
+    "sourceModuleRegex": "module (.+);",
+    "moduleName": "$sourceModule",
+    "usesRegex": "import ([.a-zA-Z0-9_]+).*;",
+    "statementDelimitorRegex": "[;]"
+  },
+  {
+    "language": "C++",
+    "fileGlob": "*.{cc,cpp,h,hpp}",
+    "fileModuleRegex": ".*[/\\\\]src[/\\\\](.*)\\..*",
+    "sourceModuleRegex": "",
+    "moduleName": "$fileModule",
+    "usesRegex": "#include [<\"]([^.>\"]+).*[>\"]",
+    "statementDelimitorRegex": "[\n]"
   }
 ]

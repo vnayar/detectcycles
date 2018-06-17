@@ -59,11 +59,24 @@ public:
     }
   }
 
+  string[][] detectStronglyConnectedComponents() {
+    size_t[][] sccs = detectStronglyConnectedComponentsByModuleId();
+    string[][] sccsByName = [];
+    foreach (scc; sccs) {
+      string[] sccByName = [];
+      foreach (id; scc) {
+        sccByName ~= getModuleName(id);
+      }
+      sccsByName ~= sccByName;
+    }
+    return sccsByName;
+  }
+
   /**
    * Based upon Tarjan's strongly connected components algorithm.
    * $(LINK https://en.wikipedia.org/wiki/Tarjan%E2%80%99s_strongly_connected_components_algorithm)
    */
-  size_t[][] detectStronglyConnectedComponents() {
+  size_t[][] detectStronglyConnectedComponentsByModuleId() {
     size_t order = 1;
     size_t[] stack;
     size_t[] onStack = new size_t[numModules()];
@@ -102,7 +115,9 @@ public:
           onStack[w] = false;
           scc ~= w;
         } while (w != v);
-        return scc;
+        if (scc.length > 1) {
+          return scc;
+        }
       }
       return null;
     }

@@ -2,7 +2,6 @@ module detectcycles.extractor;
 
 import detectcycles.config;
 
-import std.format : format;
 import std.path : globMatch;
 import std.range : ElementEncodingType, isInfinite, isInputRange;
 import std.regex : matchFirst;
@@ -24,10 +23,10 @@ class Extractor {
     captures = matchFirst(sourceInput, config.sourceModuleRegex);
     string sourceNamePart = !captures.empty() ? captures[captures.length - 1] : "";
 
-    string moduleFormat = config.moduleName
-        .replace("$fileModule", "%1$s")
-        .replace("$sourceModule", "%2$s");
-    return format(moduleFormat, fileNamePart, sourceNamePart);
+    string moduleName = config.moduleName
+        .replace("$fileModule", fileNamePart)
+        .replace("$sourceModule", sourceNamePart);
+    return moduleName;
   }
 
   string[] extractUsedModuleNames(R)(Config config, R sourceInput)

@@ -10,7 +10,8 @@
   "configurations": [
     {
       "name": "executable",
-      "targetType": "executable"
+      "targetType": "executable",
+      "dflags": ["-J."],
     },
     {
       "name": "unittest",
@@ -22,6 +23,7 @@
         "test"
       ],
       "targetType": "executable",
+      "dflags": ["-J."],
       "preBuildCommands": ["dub run unit-threaded -c gen_ut_main -- -f bin/ut.d"],
       "mainSourceFile": "bin/ut.d",
       "dependencies": {

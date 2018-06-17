@@ -38,29 +38,9 @@ if (isInputRange!R && !isInfinite!R && isSomeChar!(ElementEncodingType!R)) {
   return configs;
 }
 
+string defaultConfig = import("config.json");
+
 Config[] loadConfigsFromDefault() {
-  Config javaConfig = new Config();
-  with (javaConfig) {
-    language = "Java";
-    fileGlob = "*.java";
-    fileModuleRegex = "(.+[/\\\\])?([^/\\\\]+).java";
-    sourceModuleRegex = "^package (.+);";
-    moduleName = "$sourceModule.$fileModule";
-    usesRegex = "^import ([^;]+);";
-    statementDelimitorRegex = "[;]";
-  }
-
-  Config dConfig = new Config();
-  with (dConfig) {
-    language = "D";
-    fileGlob = "*.{d,di}";
-    fileModuleRegex = "";
-    sourceModuleRegex = "^module (.+);";
-    moduleName = "$sourceModule";
-    usesRegex = "import ([.a-zA-Z0-9_]+).*;";
-    statementDelimitorRegex = "[;]";
-  }
-
-  return [javaConfig, dConfig];
+  return loadConfigsFromJson(defaultConfig);
 }
 
