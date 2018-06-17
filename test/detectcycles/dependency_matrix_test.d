@@ -3,14 +3,15 @@ module detectcycles.dependency_matrix_test;
 import unit_threaded;
 import detectcycles.dependency_matrix;
 
-@("addSymbol")
+@("addModule")
 unittest {
+  import std.range;
   auto dMatrix = new DependencyMatrix();
-  dMatrix.addSymbol("ham");
-  dMatrix.addSymbol("crab.claw");
-  dMatrix.addSymbol("ham");
+  dMatrix.addModule("ham");
+  dMatrix.addModule("crab.claw");
+  dMatrix.addModule("ham");
 
-  (dMatrix.numSymbols()).shouldEqual(2);
+  (dMatrix.numModules()).shouldEqual(2);
 
   (dMatrix.getModuleId("ham")).shouldEqual(0);
   (dMatrix.getModuleId("crab.claw")).shouldEqual(1);
@@ -18,22 +19,56 @@ unittest {
   (dMatrix.getModuleName(0)).shouldEqual("ham");
   (dMatrix.getModuleName(1)).shouldEqual("crab.claw");
 
-  (dMatrix.getDependencies(0).empty()).shouldBeTrue();
-  (dMatrix.getDependencies(1).empty()).shouldBeTrue();
+  (dMatrix.getDependencies(0).empty).shouldBeTrue();
+  (dMatrix.getDependencies(1).empty).shouldBeTrue();
 }
 
 @("addDependencies")
 unittest {
+  import std.algorithm : find;
+  import std.range;
+
   auto dMatrix = new DependencyMatrix();
   dMatrix.addDependencies("sandwich", ["bread", "cheese", "meat", "tomato"]);
   dMatrix.addDependencies("spagetti", ["noodles", "tomato", "basil"]);
   dMatrix.addDependencies("recursiveSandwich", ["recursiveSandwich", "bread", "cheese"]);
 
-  (dMatrix.numSymbols()).shouldEqual(9);
-  (dMatrix.getDependencies(dMatrix.getModuleId("sandwich")).length()).shouldEqual(4);
-  (dMatrix.getDependencies(dMatrix.getModuleId("recursiveSandwich")).length()).shouldEqual(3);
+  (dMatrix.numModules()).shouldEqual(9);
+  (dMatrix.getDependencies(dMatrix.getModuleId("sandwich")).length).shouldEqual(4);
+  (dMatrix.getDependencies(dMatrix.getModuleId("recursiveSandwich")).length).shouldEqual(3);
 
-  dMatrix.getModuleId("meat").shouldBeIn(dMatrix.getDependencies(dMatrix.getModuleId("sandwich")));
-  dMatrix.getModuleId("basil")
-      .shouldNotBeIn(dMatrix.getDependencies(dMatrix.getModuleId("sandwich")));
+  dMatrix.getDependencies(dMatrix.getModuleId("sandwich"))
+      .find(dMatrix.getModuleId("meat"))
+      .empty
+      .shouldBeFalse;
+  dMatrix.getDependencies(dMatrix.getModuleId("sandwich"))
+      .find(dMatrix.getModuleId("basil"))
+      .empty
+      .shouldBeTrue;
+}
+
+@("detectStronglyConnectedComponents")
+unittest {
+  auto dMatrix = new DependencyMatrix();
+
+  dMatrix.addDependencies("business", ["time", "money", "ideas"]);
+  dMatrix.addDependencies("ideas", ["talent", "time"]);
+  dMatrix.addDependencies("time", ["money"]);
+  dMatrix.addDependencies("money", ["business"]);
+
+  dMatrix.addDependencies("city", ["people", "infrastructure"]);
+  dMatrix.addDependencies("infrastructure", ["workers", "resources"]);
+  dMatrix.addDependencies("workers", ["city"]);
+
+  size_t[][] sccs = dMatrix.detectStronglyConnectedComponents();
+
+  (sccs.length).shouldEqual(2);
+
+  (sccs[0].length).shouldEqual(4);
+  (dMatrix.getModuleId("business")).shouldBeIn(sccs[0]);
+  (dMatrix.getModuleId("ideas")).shouldBeIn(sccs[0]);
+  (dMatrix.getModuleId("time")).shouldBeIn(sccs[0]);
+  (dMatrix.getModuleId("money")).shouldBeIn(sccs[0]);
+
+  (sccs[1].length).shouldEqual(3);
 }

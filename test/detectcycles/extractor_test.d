@@ -47,23 +47,25 @@ EOS";
 
 @("extractModuleName")
 unittest {
-  auto extractor = new Extractor(initConfigs());
+  Config[] configs = initConfigs();
+  auto extractor = new Extractor();
 
   string fileSource = getFileSource();
 
-  (extractor.extractModuleName(extractor.configs[0], "/a/b/c/Ham.java", fileSource))
+  (extractor.extractModuleName(configs[0], "/a/b/c/Ham.java", fileSource))
       .shouldEqual("cat.dog.fish.Ham");
-  (extractor.extractModuleName(extractor.configs[0], "../a/b/c/Ham.java", fileSource))
+  (extractor.extractModuleName(configs[0], "../a/b/c/Ham.java", fileSource))
       .shouldEqual("cat.dog.fish.Ham");
-  (extractor.extractModuleName(extractor.configs[0], "a/b/c/Ham.java", fileSource))
+  (extractor.extractModuleName(configs[0], "a/b/c/Ham.java", fileSource))
       .shouldEqual("cat.dog.fish.Ham");
 }
 
 @("extractUsedModuleNames")
 unittest {
-  auto extractor = new Extractor(initConfigs());
+  Config[] configs = initConfigs();
+  auto extractor = new Extractor();
   string fileSource = getFileSource();
-  string[] usedModules = extractor.extractUsedModuleNames(extractor.configs[0], fileSource);
+  string[] usedModules = extractor.extractUsedModuleNames(configs[0], fileSource);
   (usedModules.length).shouldEqual(2);
 
   (usedModules[0]).shouldEqual("a.b.c");
