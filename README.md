@@ -106,9 +106,12 @@ The format of the config file is as follows:
     # The variables $sourceModule and $fileModule will be substituted.
     "moduleName": "$sourceModule.$fileModule",
 
-    # A regular expression to detect a 'uses' or 'depends' relationship.
-    # THe last matching group '()' will be the name of module that is used.
-    "usesRegex": "^import ([^;]+);",
+    # Regular expressions to detect a 'uses' or 'depends' relationship.
+    # The last matching group '()' will be the name of module that is used.
+    # These regexes are checked in order, only the first match will apply.
+    "usesRegexes": [
+      "^import ([^;]+);"
+    ],
 
     # A delimitor for a uses statement in the language being used.
     # Note: In C++, '#include' statements are used for dependencies, so '\n' is the delimitor.
@@ -120,9 +123,26 @@ The format of the config file is as follows:
     "fileModuleRegex": "",
     "sourceModuleRegex": "module (.+);",
     "moduleName": "$sourceModule",
-    "usesRegex": "import ([.a-zA-Z0-9_]+).*;",
+    "usesRegexes": [
+      "import ([.a-zA-Z0-9_]+).*;"
+    ],
     "statementDelimitorRegex": "[;]"
   },
   ...
 ]
 ```
+
+## Known Limitations
+
+These are problem-spots that I'm still contemplating good solutions for:
+* Java does not require imports for modules in the same package, thus these relations may be missed
+  if there is no "import" statement.
+* C++ allows forward declarations without having to "#include", which are resolved at link time.
+
+## Future Ideas
+
+These are ideas for increasing the usefulness of this tool.
+* Allow fuzzy-matching of module names.
+* Add in knowledge of packages, and the relation between modules and them. Very dubious with C++.
+* Provide custom configuration files for projects with known patterns, such as Java Spring.
+* Add more language configurations to the default: Go, Python, Rust, JavaScript, Perl, etc.

@@ -9,12 +9,46 @@ import std.traits : isSomeChar;
  * determine their module name and module dependencies.
  */
 class Config {
+  /**
+   * The name of the language when chosen with the "--language" option.
+   */
   string language;
+
+  /**
+   * The filter used to detect files for this language.
+   * For format, see: https://dlang.org/phobos/std_path.html#globMatch
+   */
   string fileGlob;
+
+  /**
+   * A regular expression to capture the part of the file name used to build the module name.
+   * The last matching group '()' will be saved as $fileModule.
+   */
   string fileModuleRegex;
+
+  /**
+   * A regular expression matching statements of source code used to build a module name.
+   * The last matching group '()' will be saved as $sourceModule.
+   */
   string sourceModuleRegex;
+
+  /**
+   * A string name of the module.
+   * The variables $sourceModule and $fileModule will be substituted.
+   */
   string moduleName;
-  string usesRegex;
+
+  /**
+   * Regular expressions to detect a 'uses' or 'depends' relationship.
+   * The last matching group '()' will be the name of module that is used.
+   * These regexes are checked in order, only the first match will apply.
+   */
+  string[] usesRegexes;
+
+  /**
+   * A delimitor for a uses statement in the language being used.
+   * Note: In C++, '#include' statements are used for dependencies, so '\n' is the delimitor.
+   */
   string statementDelimitorRegex;
 }
 
@@ -31,7 +65,10 @@ if (isInputRange!R && !isInfinite!R && isSomeChar!(ElementEncodingType!R)) {
     config.fileModuleRegex = val["fileModuleRegex"].str;
     config.sourceModuleRegex = val["sourceModuleRegex"].str;
     config.moduleName = val["moduleName"].str;
-    config.usesRegex = val["usesRegex"].str;
+    config.usesRegexes = [];
+    foreach (usesRegexValue; val["usesRegexes"].array) { 
+      config.usesRegexes ~= usesRegexValue.str;
+    }
     config.statementDelimitorRegex = val["statementDelimitorRegex"].str;
     configs ~= config;
   }

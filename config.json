@@ -5,7 +5,9 @@
     "fileModuleRegex": "(.+[/\\\\])?([^/\\\\]+).java",
     "sourceModuleRegex": "^package (.+);",
     "moduleName": "$sourceModule.$fileModule",
-    "usesRegex": "^import ([^;]+);",
+    "usesRegexes": [
+      "import ([^;]+);"
+    ],
     "statementDelimitorRegex": "[;]"
   },
   {
@@ -14,7 +16,9 @@
     "fileModuleRegex": "",
     "sourceModuleRegex": "module (.+);",
     "moduleName": "$sourceModule",
-    "usesRegex": "import ([.a-zA-Z0-9_]+).*;",
+    "usesRegexes": [
+      "import ([.a-zA-Z0-9_]+).*;"
+    ],
     "statementDelimitorRegex": "[;]"
   },
   {
@@ -23,7 +27,9 @@
     "fileModuleRegex": ".*[/\\\\]src[/\\\\](.*)\\..*",
     "sourceModuleRegex": "",
     "moduleName": "$fileModule",
-    "usesRegex": "#include [<\"]([^.>\"]+).*[>\"]",
+    "usesRegexes": [
+      "#include [<\"]([^.>\"]+).*[>\"]"
+    ],
     "statementDelimitorRegex": "[\n]"
   }
 ]

@@ -12,7 +12,10 @@ Config[] initConfigs() {
     fileModuleRegex = "(.+[/\\\\])?([^/\\\\]+).java";
     sourceModuleRegex = "package (.+);";
     moduleName = "$sourceModule.$fileModule";
-    usesRegex = "import ([^;]+);";
+    usesRegexes = [
+        "import ([^;]+);",
+        "@Autowired[ \\t\\n]+(private|public)[ \\t\\n]+([_0-9a-zA-Z]+)"
+    ];
     statementDelimitorRegex = "[;]";
   }
 
@@ -23,7 +26,7 @@ Config[] initConfigs() {
     fileModuleRegex = "";
     sourceModuleRegex = "module (.+);";
     moduleName = "$sourceModule";
-    usesRegex = "import ([^;]+);";
+    usesRegexes = ["import ([^;]+);"];
     statementDelimitorRegex = "[;]";
   }
 
@@ -38,6 +41,9 @@ import a.b.c;
 import d.e.f;
 
 class Ham {
+  @Autowired
+  private FishDog fishDog;
+
   static void main() {
     System.out.println("hello world");
   }
@@ -66,8 +72,9 @@ unittest {
   auto extractor = new Extractor();
   string fileSource = getFileSource();
   string[] usedModules = extractor.extractUsedModuleNames(configs[0], fileSource);
-  (usedModules.length).shouldEqual(2);
+  (usedModules.length).shouldEqual(3);
 
   (usedModules[0]).shouldEqual("a.b.c");
   (usedModules[1]).shouldEqual("d.e.f");
+  (usedModules[2]).shouldEqual("FishDog");
 }

@@ -2,9 +2,10 @@ module detectcycles.extractor;
 
 import detectcycles.config;
 
+import std.algorithm : map;
 import std.path : globMatch;
 import std.range : ElementEncodingType, isInfinite, isInputRange;
-import std.regex : matchFirst;
+import std.regex : matchFirst, regex, Regex;
 import std.string : replace, empty;
 import std.traits : isSomeChar;
 
@@ -35,13 +36,20 @@ class Extractor {
     assert(config !is null);
   } body {
     string[] used;
-    while (!sourceInput.empty > 0) {
-      auto captures = matchFirst(sourceInput, config.usesRegex, config.statementDelimitorRegex);
-      if (captures.whichPattern == 1 && !captures.empty()) {
-        used ~= captures[captures.length - 1];
-        sourceInput = captures.post();
-      } else if (captures.whichPattern == 2) {
-        sourceInput = captures.post();
+    Regex!char statementDelimitorRegex = regex(".*?" ~ config.statementDelimitorRegex, "s");
+    auto usesRegexes = config.usesRegexes
+        .map!(usesRegexStr => regex(usesRegexStr, "s"));
+    while (!sourceInput.empty) {
+      auto statementCaptures = matchFirst(sourceInput, statementDelimitorRegex);
+      if (!statementCaptures.empty()) {
+        foreach (usesRegex; usesRegexes) {
+          auto captures = matchFirst(statementCaptures.hit(), usesRegex);
+          if (!captures.empty()) {
+            used ~= captures[captures.length - 1];
+            break;
+          }
+        }
+        sourceInput = statementCaptures.post();
       } else {
         sourceInput = "";
       }

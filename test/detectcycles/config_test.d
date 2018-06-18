@@ -13,7 +13,10 @@ Config[] initTestLanguageConfigs() {
     "fileModuleRegex": ".*\\([^/\\\\]\\).java",
     "sourceModuleRegex": "package \\(.*\\);",
     "moduleName": "$sourceModule.$fileModule",
-    "usesRegex": "import ([^;]+);",
+    "usesRegexes": [
+      "there is no such thing as 'hamcakes'",
+      "import ([^;]+);"
+    ],
     "statementDelimitorRegex": "[;]"
   },
   {
@@ -22,7 +25,9 @@ Config[] initTestLanguageConfigs() {
     "fileModuleRegex": "",
     "sourceModuleRegex": "module \\(.*\\);",
     "moduleName": "$sourceModule",
-    "usesRegex": "import ([^;]+);",
+    "usesRegexes": [
+      "import ([^;]+);"
+    ],
     "statementDelimitorRegex": "[;]"
   }
 ]
@@ -41,6 +46,7 @@ unittest {
   (javaConfig.fileModuleRegex).shouldEqual(".*\\([^/\\\\]\\).java");
   (javaConfig.sourceModuleRegex).shouldEqual("package \\(.*\\);");
   (javaConfig.moduleName).shouldEqual("$sourceModule.$fileModule");
-  (javaConfig.usesRegex).shouldEqual("import ([^;]+);");
+  (javaConfig.usesRegexes.length).shouldEqual(2);
+  (javaConfig.usesRegexes[1]).shouldEqual("import ([^;]+);");
   (javaConfig.statementDelimitorRegex).shouldEqual("[;]");
 }
