@@ -51,6 +51,7 @@ unittest {
 unittest {
   auto dMatrix = new DependencyMatrix();
 
+  dMatrix.addDependencies("building", ["business"]);
   dMatrix.addDependencies("business", ["time", "money", "ideas"]);
   dMatrix.addDependencies("ideas", ["talent", "time"]);
   dMatrix.addDependencies("time", ["money"]);

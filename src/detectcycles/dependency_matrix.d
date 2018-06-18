@@ -83,7 +83,9 @@ public:
     size_t[] discoverOrder = new size_t[numModules()];
     size_t[] lowestReachableOrder = new size_t[numModules()];
 
-    size_t[] strongConnect(size_t v) {
+    size_t[][] stronglyConnectedComponents = [];
+
+    void strongConnect(size_t v) {
       // Initialize the state of the vertex as it is discovered in the depth-first search.
       discoverOrder[v] = order;
       lowestReachableOrder[v] = order;
@@ -106,7 +108,6 @@ public:
       // If v is a root of a depth-first tree, pop the stack and make the
       // strongly-connected component.
       if (lowestReachableOrder[v] == discoverOrder[v]) {
-        // Strongly Connected Component
         size_t[] scc = [];
         size_t w;
         do {
@@ -116,19 +117,15 @@ public:
           scc ~= w;
         } while (w != v);
         if (scc.length > 1) {
-          return scc;
-        }
-      }
-      return null;
-    }
-
-    size_t[][] stronglyConnectedComponents = [];
-    foreach (moduleId; 0 .. numModules()) {
-      if (discoverOrder[moduleId] == 0) {
-        size_t[] scc = strongConnect(moduleId);
-        if (scc != null) {
           stronglyConnectedComponents ~= scc;
         }
+      }
+    }
+
+    // Build all the strongly connected components.
+    foreach (moduleId; 0 .. numModules()) {
+      if (discoverOrder[moduleId] == 0) {
+        strongConnect(moduleId);
       }
     }
 

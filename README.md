@@ -132,6 +132,30 @@ The format of the config file is as follows:
 ]
 ```
 
+## Example Configurations
+
+### Java Spring
+
+The following configuration is useful for detecting cycles in Java Spring projects, assuming that
+they have unique file names (the package is dropped).
+
+```json
+[
+  {
+    "language": "Java",
+    "fileGlob": "*.java",
+    "fileModuleRegex": "(.+[/\\\\])?([^/\\\\]+).java",
+    "sourceModuleRegex": "^package (.+);",
+    "moduleName": "$fileModule",
+    "usesRegexes": [
+      "import .*\\.(.+);",
+      "(@Autowired|@Inject)\\s+((private|public)\\s+)?(\\w+).*;"
+    ],
+    "statementDelimitorRegex": "[;]"
+  }
+]
+```
+
 ## Known Limitations
 
 These are problem-spots that I'm still contemplating good solutions for:
