@@ -2,12 +2,12 @@ import detectcycles.config;
 import detectcycles.extractor;
 import detectcycles.dependency_matrix;
 
+import std.algorithm : find, map;
 import std.file : readText, dirEntries, SpanMode;
 import std.getopt : getopt, GetoptResult, defaultGetoptPrinter;
 import std.path : expandTilde;
+import std.range : empty, takeOne;
 import std.stdio : write, writeln;
-import std.algorithm : find, map;
-import std.range : takeOne;
 
 enum LogLevel { OFF, DEBUG }
 class Logger {
@@ -28,6 +28,7 @@ void main(string[] args)
   bool debugLog;
   bool generate;
   string language;
+  bool plantUml;
   bool showLanguages;
 
   GetoptResult getOptResult = getopt(
@@ -36,6 +37,7 @@ void main(string[] args)
       "debug|d", "Enable debug logging.", &debugLog,
       "generate|g", "Generates default configurations to modify and use with -c.", &generate,
       "language|l", "Limit scanning to only a specific language.", &language,
+      "plantUml|p", "Prints the cyclical components in PlantUml syntax.", &plantUml,
       "showLanguages|s", "Show the supported languages.", &showLanguages);
 
   auto logger = new Logger( debugLog ? LogLevel.DEBUG : LogLevel.OFF);
@@ -114,20 +116,40 @@ void main(string[] args)
   }
 
   // Finally detect the cycles and print them out.
-  string[][] stronglyConnectedComponents = dependencyMatrix.detectStronglyConnectedComponents();
+  size_t[][] stronglyConnectedComponents = dependencyMatrix.detectStronglyConnectedComponents();
+
   if (stronglyConnectedComponents.length == 0) {
     writeln("No cycles detected.");
   } else {
-    writeln("The following cycles were detected:");
+    writeln("The following blocks of cyclical components were detected:");
     foreach (i, scc; stronglyConnectedComponents) {
       writeln("Cycle #", i);
-      foreach (j, moduleName; scc) {
-        if (j != 0) {
-          write(" => ");
-        }
-        write(moduleName);
+      if (plantUml) {
+        printSccPlantUml(dependencyMatrix, scc);
+      } else {
+        printSccBasic(dependencyMatrix, scc);
       }
-      writeln("\n");
+      writeln("");
+    }
+  }
+}
+
+void printSccBasic(DependencyMatrix m, size_t[] scc) {
+  foreach (i, moduleId; scc) {
+    if (i != 0) {
+      write(" => ");
+    }
+    write(m.getModuleName(moduleId));
+  }
+  writeln("\n");
+}
+
+void printSccPlantUml(DependencyMatrix m, size_t[] scc) {
+  foreach (componentId; scc) {
+    foreach (dependencyId; m.getDependencies(componentId)) {
+      if (!find(scc, dependencyId).empty()) {
+        writeln(m.getModuleName(componentId), " ..> ", m.getModuleName(dependencyId));
+      }
     }
   }
 }

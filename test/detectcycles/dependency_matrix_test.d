@@ -61,7 +61,7 @@ unittest {
   dMatrix.addDependencies("infrastructure", ["workers", "resources"]);
   dMatrix.addDependencies("workers", ["city"]);
 
-  size_t[][] sccs = dMatrix.detectStronglyConnectedComponentsByModuleId();
+  size_t[][] sccs = dMatrix.detectStronglyConnectedComponents();
 
   (sccs.length).shouldEqual(2);
 
