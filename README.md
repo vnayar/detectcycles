@@ -58,6 +58,7 @@ Usage: detectcycles [options] [srcDir1] [srcDir2] ...
 -d         --debug Enable debug logging.
 -g      --generate Generates default configurations to modify and use with -c.
 -l      --language Limit scanning to only a specific language.
+-p      --plantUml Prints the cyclical components in PlantUml syntax.
 -s --showLanguages Show the supported languages.
 -h          --help This help information.
 ```
