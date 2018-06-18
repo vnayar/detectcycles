@@ -37,14 +37,10 @@ unittest {
   (dMatrix.getDependencies(dMatrix.getModuleId("sandwich")).length).shouldEqual(4);
   (dMatrix.getDependencies(dMatrix.getModuleId("recursiveSandwich")).length).shouldEqual(3);
 
-  dMatrix.getDependencies(dMatrix.getModuleId("sandwich"))
-      .find(dMatrix.getModuleId("meat"))
-      .empty
-      .shouldBeFalse;
-  dMatrix.getDependencies(dMatrix.getModuleId("sandwich"))
-      .find(dMatrix.getModuleId("basil"))
-      .empty
+  (dMatrix.getModuleId("meat") in dMatrix.getDependencies(dMatrix.getModuleId("sandwich")))
       .shouldBeTrue;
+  (dMatrix.getModuleId("basil") in dMatrix.getDependencies(dMatrix.getModuleId("sandwich")))
+      .shouldBeFalse;
 }
 
 @("detectStronglyConnectedComponentsByModuleId")
@@ -61,7 +57,7 @@ unittest {
   dMatrix.addDependencies("infrastructure", ["workers", "resources"]);
   dMatrix.addDependencies("workers", ["city"]);
 
-  size_t[][] sccs = dMatrix.detectStronglyConnectedComponents();
+  IdSet[] sccs = dMatrix.detectStronglyConnectedComponents();
 
   (sccs.length).shouldEqual(2);
 

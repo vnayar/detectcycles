@@ -6,13 +6,13 @@ import std.typecons : Typedef;
 import std.algorithm : min;
 import std.range;
 
-//alias IdSet = RedBlackTree!size_t;
+alias IdSet = RedBlackTree!size_t;
 
 class DependencyMatrix {
 private:
   size_t[string] _moduleIdByName;
   string[] _moduleNameById;
-  size_t[][] _dependencies;
+  IdSet[] _dependencies;
 
   invariant {
     size_t length = _moduleIdByName.length;
@@ -34,16 +34,16 @@ public:
     return _moduleNameById[moduleId];
   }
 
-  size_t[] getDependencies(size_t moduleId) {
+  IdSet getDependencies(size_t moduleId) {
     return _dependencies[moduleId];
   }
 
   /// Idempotently add a new module to the module table.
   void addModule(string moduleName) {
     if (moduleName !in _moduleIdByName) {
-      auto id = _dependencies.length;
+      auto id = numModules();
       _dependencies.length++;
-      _dependencies[id] = [];
+      _dependencies[id] = new IdSet();
       _moduleNameById.length++;
       _moduleNameById[id] = moduleName;
       _moduleIdByName[moduleName] = id;
@@ -55,7 +55,7 @@ public:
     addModule(moduleName);
     foreach (dependency; dependencyNames) {
       addModule(dependency);
-      _dependencies[getModuleId(moduleName)] ~= getModuleId(dependency);
+      _dependencies[getModuleId(moduleName)].insert(getModuleId(dependency));
     }
   }
 
@@ -63,14 +63,14 @@ public:
    * Based upon Tarjan's strongly connected components algorithm.
    * $(LINK https://en.wikipedia.org/wiki/Tarjan%E2%80%99s_strongly_connected_components_algorithm)
    */
-  size_t[][] detectStronglyConnectedComponents() {
+  IdSet[] detectStronglyConnectedComponents() {
     size_t order = 1;
     size_t[] stack;
     size_t[] onStack = new size_t[numModules()];
     size_t[] discoverOrder = new size_t[numModules()];
     size_t[] lowestReachableOrder = new size_t[numModules()];
 
-    size_t[][] stronglyConnectedComponents = [];
+    IdSet[] stronglyConnectedComponents = [];
 
     void strongConnect(size_t v) {
       // Initialize the state of the vertex as it is discovered in the depth-first search.
@@ -95,13 +95,13 @@ public:
       // If v is a root of a depth-first tree, pop the stack and make the
       // strongly-connected component.
       if (lowestReachableOrder[v] == discoverOrder[v]) {
-        size_t[] scc = [];
+        IdSet scc = new IdSet();
         size_t w;
         do {
           w = stack.back();
           stack.popBack();
           onStack[w] = false;
-          scc ~= w;
+          scc.insert(w);
         } while (w != v);
         if (scc.length > 1) {
           stronglyConnectedComponents ~= scc;

@@ -116,14 +116,14 @@ void main(string[] args)
   }
 
   // Finally detect the cycles and print them out.
-  size_t[][] stronglyConnectedComponents = dependencyMatrix.detectStronglyConnectedComponents();
+  IdSet[] stronglyConnectedComponents = dependencyMatrix.detectStronglyConnectedComponents();
 
   if (stronglyConnectedComponents.length == 0) {
     writeln("No cycles detected.");
   } else {
     writeln("The following blocks of cyclical components were detected:");
     foreach (i, scc; stronglyConnectedComponents) {
-      writeln("Cycle #", i);
+      writeln("Cycle #", i, " (", scc.length, " components)");
       if (plantUml) {
         printSccPlantUml(dependencyMatrix, scc);
       } else {
@@ -134,9 +134,10 @@ void main(string[] args)
   }
 }
 
-void printSccBasic(DependencyMatrix m, size_t[] scc) {
-  foreach (i, moduleId; scc) {
-    if (i != 0) {
+void printSccBasic(DependencyMatrix m, IdSet scc) {
+  size_t i = 0;
+  foreach (moduleId; scc) {
+    if (i++ != 0) {
       write(" => ");
     }
     write(m.getModuleName(moduleId));
@@ -144,10 +145,10 @@ void printSccBasic(DependencyMatrix m, size_t[] scc) {
   writeln("\n");
 }
 
-void printSccPlantUml(DependencyMatrix m, size_t[] scc) {
+void printSccPlantUml(DependencyMatrix m, IdSet scc) {
   foreach (componentId; scc) {
     foreach (dependencyId; m.getDependencies(componentId)) {
-      if (!find(scc, dependencyId).empty()) {
+      if (dependencyId in scc) {
         writeln(m.getModuleName(componentId), " ..> ", m.getModuleName(dependencyId));
       }
     }
