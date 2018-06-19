@@ -11,6 +11,17 @@
     "statementDelimitorRegex": "[;]"
   },
   {
+    "language": "Kotlin",
+    "fileGlob": "*.kt",
+    "fileModuleRegex": "(.+[/\\\\])?([^/\\\\]+).kt",
+    "sourceModuleRegex": "^package ([.\\w]+)",
+    "moduleName": "$sourceModule.$fileModule",
+    "usesRegexes": [
+      "import ([.\\w]+);"
+    ],
+    "statementDelimitorRegex": "[\n]"
+  },
+  {
     "language": "D",
     "fileGlob": "*.{d,di}",
     "fileModuleRegex": "",
